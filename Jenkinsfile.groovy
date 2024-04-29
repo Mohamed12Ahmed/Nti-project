@@ -53,7 +53,7 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    sh "kubectl apply -f ${K8S_FILE}"
+                    sh "kubectl apply -f deployment k.yml "
                 }
             }
         }
