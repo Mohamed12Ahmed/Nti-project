@@ -18,7 +18,7 @@ pipeline {
                     sh '''
                     IMAGE_TAG="${IMAGE_TAG}"
                     ls
-                    docker build -t ${ECR_URL}/${IMAGE_TAG} ./
+                    docker build -t ${ECR_URL}/${IMAGE_TAG} ./SimpleDjangoApp-master
                     '''
                 }
             }
