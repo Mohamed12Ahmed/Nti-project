@@ -1,0 +1,76 @@
+- name: Install_packages
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Updating
+      apt:
+        update_cache: true
+  
+    - name: Install JAVA-JDK-17
+      apt:
+        name: openjdk-17-jdk
+        state: latest
+
+    - name: Download Jenkins keyring
+      get_url:
+        url: https://pkg.jenkins.io/debian/jenkins.io-2023.key
+        dest: /usr/share/keyrings/jenkins-keyring.asc
+
+    - name: Add Jenkins repository
+      apt_repository:
+        repo: "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian binary/"
+        state: present 
+
+    - name: Updating
+      apt:
+        update_cache: true
+
+    - name: Install Jenkins
+      apt:
+        name: jenkins
+        state: present
+
+    - name: Start Jenkins            
+      service:
+        name: jenkins
+        enabled: yes
+        state: started  
+
+    - name: Start Docker service
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Change permission of Docker socket
+      file:
+        path: /var/run/docker.sock
+        mode: "0777"
+
+    - name: Download Minikube binary
+      shell: "curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64"
+
+    - name: Install Minikube binary
+      shell: "sudo install minikube-linux-amd64 /usr/local/bin/minikube"
+
+    - name: Start Minikube with Docker driver
+      become: false
+      shell: "minikube start --driver=docker"
+
+    - name: install kubectl
+      shell: "snap install kubectl --classic"
+
+    - name: refresh kubectl
+      shell: "sudo snap refresh kubectl --channel=1.23/stable"
+
+  
+- name: Install AWS CLI
+  hosts: all
+  become: true
+  tasks:
+    - name: Install AWS CLI
+      ansible.builtin.package:
+        name: awscli
+        state: present
+
